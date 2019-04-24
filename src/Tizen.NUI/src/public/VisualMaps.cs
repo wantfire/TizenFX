@@ -27,6 +27,49 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class VisualMap
     {
+        /// <summary>
+        /// outputVisualMap.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        protected PropertyMap _outputVisualMap = null;
+
+        /// <summary>
+        /// The shader of the visual.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        protected PropertyMap _shader = null;
+        //private PropertyMap _transform = null;
+
+        /// <summary>
+        /// The premultipliedAlpha of the visual.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        protected bool? _premultipliedAlpha = null;
+
+        /// <summary>
+        /// The mixColor of the Visual.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        protected Color _mixColor = null;
+
+        /// <summary>
+        /// The opacity of the visual.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        protected float? _opacity = null;
+
+        /// <summary>
+        /// The FittingMode of the visual.
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        protected VisualFittingModeType? _visualFittingMode = null;
+
+        /// <summary>
+        /// The map for visual.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        protected PropertyMap _commonlyUsedMap = null;
+
         private Vector2 _visualSize = null;
         private Vector2 _visualOffset = null;
         private Vector2 _visualOffsetPolicy = null;
@@ -37,30 +80,6 @@ namespace Tizen.NUI
         private PropertyMap _visualTransformMap = null;
 
         private int? _depthIndex = null;
-
-        /// <summary>
-        /// outputVisualMap.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        protected PropertyMap _outputVisualMap = null;
-
-        internal string Name
-        {
-            set;
-            get;
-        }
-
-        internal int VisualIndex
-        {
-            set;
-            get;
-        }
-
-        internal VisualView Parent
-        {
-            set;
-            get;
-        }
 
         /// <summary>
         /// Constructor.
@@ -447,17 +466,6 @@ namespace Tizen.NUI
             }
         }
 
-        private void ComposingTransformMap()
-        {
-            _visualTransformMap = new PropertyMap();
-            if (_visualSize != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.Size, new PropertyValue(_visualSize)); }
-            if (_visualOffset != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.Offset, new PropertyValue(_visualOffset)); }
-            if (_visualOffsetPolicy != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.OffsetPolicy, new PropertyValue(_visualOffsetPolicy)); }
-            if (_visualSizePolicy != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.SizePolicy, new PropertyValue(_visualSizePolicy)); }
-            if (_visualOrigin != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.Origin, new PropertyValue((int)_visualOrigin)); }
-            if (_visualAnchorPoint != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.AnchorPoint, new PropertyValue((int)_visualAnchorPoint)); }
-        }
-
         /// <summary>
         /// Gets the transform map used by the visual.
         /// </summary>
@@ -469,15 +477,6 @@ namespace Tizen.NUI
                 ComposingTransformMap();
                 return _visualTransformMap;
             }
-        }
-
-        /// <summary>
-        /// Compose the out visual map.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        protected virtual void ComposingPropertyMap()
-        {
-            _outputVisualMap = new PropertyMap();
         }
 
         /// <summary>
@@ -493,49 +492,6 @@ namespace Tizen.NUI
             }
         }
 
-        internal void UpdateVisual()
-        {
-            if (VisualIndex > 0)
-            {
-                NUILog.Debug("UpdateVisual()! VisualIndex=" + VisualIndex);
-                Parent.UpdateVisual(VisualIndex, Name, this);
-            }
-            else
-            {
-                NUILog.Debug("VisualIndex was not set");
-            }
-        }
-
-        /// <summary>
-        /// The shader of the visual.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        protected PropertyMap _shader = null;
-        //private PropertyMap _transform = null;
-
-        /// <summary>
-        /// The premultipliedAlpha of the visual.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        protected bool? _premultipliedAlpha = null;
-
-        /// <summary>
-        /// The mixColor of the Visual.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        protected Color _mixColor = null;
-
-        /// <summary>
-        /// The opacity of the visual.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        protected float? _opacity = null;
-
-        /// <summary>
-        /// The map for visual.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        protected PropertyMap _commonlyUsedMap = null;
 
         /// <summary>
         /// The shader to use in the visual.
@@ -606,6 +562,92 @@ namespace Tizen.NUI
             }
         }
 
+        /// <summary>
+        /// The fitting mode of the visual.
+        /// The default is defined by the type of visual (if it is suitable to be stretched or not).
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        public VisualFittingModeType VisualFittingMode
+        {
+            get
+            {
+                if (_visualFittingMode == null)
+                {
+                    if (this is AnimatedImageVisual ||
+                        this is MeshVisual ||
+                        this is PrimitiveVisual ||
+                        this is TextVisual)
+                    {
+                        return VisualFittingModeType.FitKeepAspectRatio;
+                    }
+                    else
+                    {
+                        return VisualFittingModeType.Fill;
+                    }
+                }
+                else
+                {
+                    return (VisualFittingModeType)_visualFittingMode;
+                }
+            }
+            set
+            {
+                _visualFittingMode = value;
+                UpdateVisual();
+            }
+        }
+
+        internal string Name
+        {
+            set;
+            get;
+        }
+
+        internal int VisualIndex
+        {
+            set;
+            get;
+        }
+
+        internal VisualView Parent
+        {
+            set;
+            get;
+        }
+
+        internal void UpdateVisual()
+        {
+            if (VisualIndex > 0)
+            {
+                NUILog.Debug("UpdateVisual()! VisualIndex=" + VisualIndex);
+                Parent.UpdateVisual(VisualIndex, Name, this);
+            }
+            else
+            {
+                NUILog.Debug("VisualIndex was not set");
+            }
+        }
+
+        /// <summary>
+        /// Compose the out visual map.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        protected virtual void ComposingPropertyMap()
+        {
+            _outputVisualMap = new PropertyMap();
+        }
+
+        private void ComposingTransformMap()
+        {
+            _visualTransformMap = new PropertyMap();
+            if (_visualSize != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.Size, new PropertyValue(_visualSize)); }
+            if (_visualOffset != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.Offset, new PropertyValue(_visualOffset)); }
+            if (_visualOffsetPolicy != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.OffsetPolicy, new PropertyValue(_visualOffsetPolicy)); }
+            if (_visualSizePolicy != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.SizePolicy, new PropertyValue(_visualSizePolicy)); }
+            if (_visualOrigin != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.Origin, new PropertyValue((int)_visualOrigin)); }
+            if (_visualAnchorPoint != null) { _visualTransformMap.Add((int)VisualTransformPropertyType.AnchorPoint, new PropertyValue((int)_visualAnchorPoint)); }
+        }
+
     }
 
     /// <summary>
@@ -614,14 +656,6 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class ImageVisual : VisualMap
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        public ImageVisual() : base()
-        {
-        }
-
         private string _url = null;
         private string _alphaMaskUrl = null;
         private string _auxiliaryImageUrl = null;
@@ -640,6 +674,15 @@ namespace Tizen.NUI
         private ReleasePolicyType? _releasePolicy = null;
         private LoadPolicyType? _loadPolicy = null;
         private bool? _orientationCorrection = true;
+        private bool? _atlasing = false;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        public ImageVisual() : base()
+        {
+        }
 
         /// <summary>
         /// Gets or sets the URL of the image.<br />
@@ -679,7 +722,7 @@ namespace Tizen.NUI
         }
 
         /// <summary>
-        /// Overlays the auxiliary iamge on top of an NPatch image.
+        /// Overlays the auxiliary image on top of an NPatch image.
         /// The resulting visual image will be at least as large as the smallest possible n-patch or the auxiliary image, whichever is larger.
         /// </summary>
         /// <since_tizen> 5 </since_tizen>
@@ -933,8 +976,8 @@ namespace Tizen.NUI
         }
 
         /// <summary>
-        /// Get or set the Image Visual release policy<br />
-        /// It decides if a texture should be released from the cache or kept to reduce loading time <br />
+        /// Gets or sets the Image Visual release policy.<br/>
+        /// It decides if a texture should be released from the cache or kept to reduce the loading time.<br/>
         /// </summary>
         /// <since_tizen> 5 </since_tizen>
         public ReleasePolicyType ReleasePolicy
@@ -952,8 +995,8 @@ namespace Tizen.NUI
 
 
         /// <summary>
-        /// Get or set the Image Visual image loading policy<br />
-        /// It decides if a texture should be loaded immediately after source set or only after visual is added to window <br />
+        /// Gets or sets the Image Visual image loading policy.<br />
+        /// It decides if a texture should be loaded immediately after source set or only after the visual is added to the window.<br />
         /// </summary>
         /// <since_tizen> 5 </since_tizen>
         public LoadPolicyType LoadPolicy
@@ -970,7 +1013,7 @@ namespace Tizen.NUI
         }
 
         /// <summary>
-        /// Get or set whether to automatically correct the orientation based on exif data.<br />
+        /// Gets or sets whether to automatically correct the orientation based on the Exchangeable Image File (EXIF) data.<br />
         /// If not specified, the default is true.<br />
         /// For JPEG images only.<br />
         /// Optional.
@@ -989,6 +1032,23 @@ namespace Tizen.NUI
             }
         }
 
+        /// <summary>
+        /// Whether to use the texture atlas or not.
+        /// Optional. By default atlasing is off.
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        public bool Atlasing
+        {
+            get
+            {
+                return _atlasing ?? (false);
+            }
+            set
+            {
+                _atlasing = value;
+                UpdateVisual();
+            }
+        }
 
         /// <summary>
         /// Compose the out visual map.
@@ -1022,6 +1082,8 @@ namespace Tizen.NUI
                 if (_releasePolicy != null) { _outputVisualMap.Add( ImageVisualProperty.ReleasePolicy , new PropertyValue((int)_releasePolicy)); }
                 if (_loadPolicy != null) { _outputVisualMap.Add( ImageVisualProperty.LoadPolicy, new PropertyValue((int)_loadPolicy)); }
                 if (_orientationCorrection != null) { _outputVisualMap.Add( ImageVisualProperty.OrientationCorrection, new PropertyValue((bool)_orientationCorrection)); }
+                if (_atlasing != null) { _outputVisualMap.Add( ImageVisualProperty.Atlasing, new PropertyValue((bool)_atlasing)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -1032,14 +1094,6 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class TextVisual : VisualMap
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        public TextVisual() : base()
-        {
-        }
-
         private string _text = null;
         private string _fontFamily = null;
         private PropertyMap _fontStyle = null;
@@ -1049,6 +1103,18 @@ namespace Tizen.NUI
         private string _verticalAlignment = null;
         private Color _textColor = null;
         private bool? _enableMarkup = null;
+        private PropertyMap _shadow = null;
+        private PropertyMap _underline = null;
+        private PropertyMap _outline = null;
+        private PropertyMap _background = null;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        public TextVisual() : base()
+        {
+        }
 
         /// <summary>
         /// Gets or sets the text to display in the UTF-8 format.<br />
@@ -1280,6 +1346,74 @@ namespace Tizen.NUI
         }
 
         /// <summary>
+        /// Gets or sets the shadow parameters.
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        public PropertyMap Shadow
+        {
+            get
+            {
+                return _shadow;
+            }
+            set
+            {
+                _shadow = value;
+                UpdateVisual();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the underline parameters.
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        public PropertyMap Underline
+        {
+            get
+            {
+                return _underline;
+            }
+            set
+            {
+                _underline = value;
+                UpdateVisual();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the outline parameters.
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        public PropertyMap Outline
+        {
+            get
+            {
+                return _outline;
+            }
+            set
+            {
+                _outline = value;
+                UpdateVisual();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the background parameters.
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        public PropertyMap Background
+        {
+            get
+            {
+                return _background;
+            }
+            set
+            {
+                _background = value;
+                UpdateVisual();
+            }
+        }
+
+        /// <summary>
         /// Compose the out visual map.
         /// </summary>
         /// <since_tizen> 3 </since_tizen>
@@ -1302,6 +1436,11 @@ namespace Tizen.NUI
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_mixColor != null) { _outputVisualMap.Add((int)Visual.Property.MixColor, new PropertyValue(_mixColor)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_shadow != null) { _outputVisualMap.Add(TextVisualProperty.Shadow, new PropertyValue(_shadow)); }
+                if (_underline != null) { _outputVisualMap.Add(TextVisualProperty.Underline, new PropertyValue(_underline)); }
+                if (_outline != null) { _outputVisualMap.Add(TextVisualProperty.Outline, new PropertyValue(_outline)); }
+                if (_background != null) { _outputVisualMap.Add(TextVisualProperty.Background, new PropertyValue(_background)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -1312,6 +1451,10 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class BorderVisual : VisualMap
     {
+        private Color _color = null;
+        private float? _size = null;
+        private bool? _antiAliasing = null;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -1319,10 +1462,6 @@ namespace Tizen.NUI
         public BorderVisual() : base()
         {
         }
-
-        private Color _color = null;
-        private float? _size = null;
-        private bool? _antiAliasing = null;
 
         /// <summary>
         /// Gets or sets the color of the border.<br />
@@ -1396,6 +1535,7 @@ namespace Tizen.NUI
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_mixColor != null) { _outputVisualMap.Add((int)Visual.Property.MixColor, new PropertyValue(_mixColor)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -1406,6 +1546,9 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class ColorVisual : VisualMap
     {
+        private Color _mixColorForColorVisual = null;
+        private bool? _renderIfTransparent = false;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -1413,8 +1556,6 @@ namespace Tizen.NUI
         public ColorVisual() : base()
         {
         }
-
-        private Color _mixColorForColorVisual = null;
 
         /// <summary>
         /// Gets or sets the solid color required.<br />
@@ -1435,6 +1576,24 @@ namespace Tizen.NUI
         }
 
         /// <summary>
+        /// Gets or sets whether to render if the MixColor is transparent.
+        /// By default it is false, which means that the ColorVisual will not render if the MIX_COLOR is transparent.
+        /// </summary>
+        /// <since_tizen> 5 </since_tizen>
+        public bool RenderIfTransparent
+        {
+            get
+            {
+                return _renderIfTransparent ?? (false);
+            }
+            set
+            {
+                _renderIfTransparent = value;
+                UpdateVisual();
+            }
+        }
+
+        /// <summary>
         /// Compose the out visual map.
         /// </summary>
         /// <since_tizen> 3 </since_tizen>
@@ -1448,6 +1607,8 @@ namespace Tizen.NUI
                 if (_shader != null) { _outputVisualMap.Add((int)Visual.Property.Shader, new PropertyValue(_shader)); }
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_renderIfTransparent != null) { _outputVisualMap.Add(ColorVisualProperty.RenderIfTransparent, new PropertyValue((bool)_renderIfTransparent)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -1458,14 +1619,6 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class GradientVisual : VisualMap
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        public GradientVisual() : base()
-        {
-        }
-
         private Vector2 _startPosition = null;
         private Vector2 _endPosition = null;
         private Vector2 _center = null;
@@ -1474,6 +1627,14 @@ namespace Tizen.NUI
         private PropertyArray _stopColor = null;
         private GradientVisualUnitsType? _units = null;
         private GradientVisualSpreadMethodType? _spreadMethod = null;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        public GradientVisual() : base()
+        {
+        }
 
         /// <summary>
         /// Gets or sets the start position of a linear gradient.<br />
@@ -1647,6 +1808,7 @@ namespace Tizen.NUI
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_mixColor != null) { _outputVisualMap.Add((int)Visual.Property.MixColor, new PropertyValue(_mixColor)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -1657,14 +1819,6 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class MeshVisual : VisualMap
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        public MeshVisual() : base()
-        {
-        }
-
         private string _objectURL = null;
         private string _materialtURL = null;
         private string _texturesPath = null;
@@ -1672,6 +1826,14 @@ namespace Tizen.NUI
         private bool? _useMipmapping = null;
         private bool? _useSoftNormals = null;
         private Vector3 _lightPosition = null;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        public MeshVisual() : base()
+        {
+        }
 
         /// <summary>
         /// Gets or sets the location of the ".obj" file.<br />
@@ -1827,6 +1989,7 @@ namespace Tizen.NUI
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_mixColor != null) { _outputVisualMap.Add((int)Visual.Property.MixColor, new PropertyValue(_mixColor)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -1837,14 +2000,6 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class PrimitiveVisual : VisualMap
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <since_tizen> 3 </since_tizen>
-        public PrimitiveVisual() : base()
-        {
-        }
-
         private PrimitiveVisualShapeType? _shape = null;
         private Color _mixColorForPrimitiveVisual = null;
         private int? _slices = null;
@@ -1857,6 +2012,14 @@ namespace Tizen.NUI
         private float? _bevelPercentage = null;
         private float? _bevelSmoothness = null;
         private Vector3 _lightPosition = null;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <since_tizen> 3 </since_tizen>
+        public PrimitiveVisual() : base()
+        {
+        }
 
         /// <summary>
         /// Gets or sets the specific shape to render.<br />
@@ -2142,6 +2305,7 @@ namespace Tizen.NUI
             if (_shader != null) { _outputVisualMap.Add((int)Visual.Property.Shader, new PropertyValue(_shader)); }
             if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
             if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+            if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
         }
     }
 
@@ -2151,6 +2315,10 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class NPatchVisual : VisualMap
     {
+        private string _url = null;
+        private bool? _borderOnly = null;
+        private Rectangle _border = null;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -2158,10 +2326,6 @@ namespace Tizen.NUI
         public NPatchVisual() : base()
         {
         }
-
-        private string _url = null;
-        private bool? _borderOnly = null;
-        private Rectangle _border = null;
 
         /// <summary>
         /// Gets or sets the URL of the image.<br />
@@ -2237,6 +2401,7 @@ namespace Tizen.NUI
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_mixColor != null) { _outputVisualMap.Add((int)Visual.Property.MixColor, new PropertyValue(_mixColor)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -2247,6 +2412,8 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class SVGVisual : VisualMap
     {
+        private string _url = null;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -2254,8 +2421,6 @@ namespace Tizen.NUI
         public SVGVisual() : base()
         {
         }
-
-        private string _url = null;
 
         /// <summary>
         /// The url of the svg resource.
@@ -2289,6 +2454,7 @@ namespace Tizen.NUI
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_mixColor != null) { _outputVisualMap.Add((int)Visual.Property.MixColor, new PropertyValue(_mixColor)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -2299,6 +2465,12 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class AnimatedImageVisual : VisualMap
     {
+        private List<string> _urls = null;
+        private int? _batchSize = null;
+        private int? _cacheSize = null;
+        private float? _frameDelay = null;
+        private float? _loopCount = null;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -2306,12 +2478,6 @@ namespace Tizen.NUI
         public AnimatedImageVisual() : base()
         {
         }
-
-        private List<string> _urls = null;
-        private int? _batchSize = null;
-        private int? _cacheSize = null;
-        private float? _frameDelay = null;
-        private float? _loopCount = null;
 
         /// <summary>
         /// Gets and Sets the url in the AnimatedImageVisual.
@@ -2414,12 +2580,10 @@ namespace Tizen.NUI
         }
 
         /// <summary>
-        /// Gets and Sets the number of times the AnimatedImageVisual will be looped.
-        /// Default -1. if < 0, loop unlimited. else, loop loopCount times.
+        /// Gets and sets the number of times the AnimatedImageVisual will be looped.
+        /// The default is -1. If the number is less than 0 then it loops unlimited,otherwise loop loopCount times.
         /// </summary>
         /// <since_tizen> 5 </since_tizen>
-        /// This will be released at Tizen.NET API Level 5, so currently this would be used as inhouse API.
-        [EditorBrowsable(EditorBrowsableState.Never)]
         public float LoopCount
         {
             get
@@ -2464,6 +2628,7 @@ namespace Tizen.NUI
                 if (_premultipliedAlpha != null) { _outputVisualMap.Add((int)Visual.Property.PremultipliedAlpha, new PropertyValue((bool)_premultipliedAlpha)); }
                 if (_mixColor != null) { _outputVisualMap.Add((int)Visual.Property.MixColor, new PropertyValue(_mixColor)); }
                 if (_opacity != null) { _outputVisualMap.Add((int)Visual.Property.Opacity, new PropertyValue((float)_opacity)); }
+                if (_visualFittingMode != null) { _outputVisualMap.Add((int)Visual.Property.VisualFittingMode, new PropertyValue((int)_visualFittingMode)); }
             }
         }
     }
@@ -2476,6 +2641,13 @@ namespace Tizen.NUI
     /// <since_tizen> 3 </since_tizen>
     public class VisualAnimator : VisualMap
     {
+        private string _alphaFunction = null;
+        private int _startTime = 0;
+        private int _endTime = 0;
+        private string _target = null;
+        private string _propertyIndex = null;
+        private object _destinationValue = null;
+
         /// <summary>
         /// Create VisualAnimator object.
         /// </summary>
@@ -2483,13 +2655,6 @@ namespace Tizen.NUI
         public VisualAnimator() : base()
         {
         }
-
-        private string _alphaFunction = null;
-        private int _startTime = 0;
-        private int _endTime = 0;
-        private string _target = null;
-        private string _propertyIndex = null;
-        private object _destinationValue = null;
 
         /// <summary>
         /// Sets and Gets the AlphaFunction of this transition.

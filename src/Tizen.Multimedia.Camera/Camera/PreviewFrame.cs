@@ -38,13 +38,21 @@ namespace Tizen.Multimedia
             Plane = ConvertPlane(unmanagedStruct);
         }
 
-        private static IPreviewPlane ConvertPlane(CameraPreviewDataStruct unmanagedStruct)
+        private IPreviewPlane ConvertPlane(CameraPreviewDataStruct unmanagedStruct)
         {
             if (unmanagedStruct.NumOfPlanes == 1)
             {
                 if (unmanagedStruct.Format == CameraPixelFormat.H264 || unmanagedStruct.Format == CameraPixelFormat.Jpeg)
                 {
                     return new EncodedPlane(unmanagedStruct.Plane.EncodedPlane);
+                }
+                else if (unmanagedStruct.Format == CameraPixelFormat.Invz)
+                {
+                    return new DepthPlane(unmanagedStruct.Plane.DepthPlane);
+                }
+                else if (unmanagedStruct.Format == CameraPixelFormat.Rgba || unmanagedStruct.Format == CameraPixelFormat.Argb)
+                {
+                    return new RgbPlane(unmanagedStruct.Plane.RgbPlane);
                 }
                 else
                 {
@@ -53,6 +61,9 @@ namespace Tizen.Multimedia
             }
             else if (unmanagedStruct.NumOfPlanes == 2)
             {
+                var size = Resolution.Width * Resolution.Height;
+                unmanagedStruct.Plane.DoublePlane.YLength = (uint)size;
+                unmanagedStruct.Plane.DoublePlane.UVLength = (uint)size / 2;
                 return new DoublePlane(unmanagedStruct.Plane.DoublePlane);
             }
             else if (unmanagedStruct.NumOfPlanes == 3)
@@ -71,6 +82,14 @@ namespace Tizen.Multimedia
                 if (unmanagedStruct.Format == CameraPixelFormat.H264 || unmanagedStruct.Format == CameraPixelFormat.Jpeg)
                 {
                     return PlaneType.EncodedPlane;
+                }
+                else if (unmanagedStruct.Format == CameraPixelFormat.Invz)
+                {
+                    return PlaneType.DepthPlane;
+                }
+                else if (unmanagedStruct.Format == CameraPixelFormat.Rgba || unmanagedStruct.Format == CameraPixelFormat.Argb)
+                {
+                    return PlaneType.RgbPlane;
                 }
                 else
                 {

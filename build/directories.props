@@ -5,14 +5,12 @@
     <ProjectRootDir>$(MSBuildThisFileDirectory)..\</ProjectRootDir>
 
     <ProjectSrcDir>$(ProjectRootDir)src\</ProjectSrcDir>
-    <InternalProjectSrcDir>$(ProjectRootDir)\internal\src\</InternalProjectSrcDir>
-
-    <ToolsDir>$(ProjectRootDir)tools\</ToolsDir>
-    <GenDummyDir>$(ToolsDir)GenDummy\</GenDummyDir>
+    <InternalProjectSrcDir>$(ProjectRootDir)\internals\src\</InternalProjectSrcDir>
 
     <OutputBaseDir>$(ProjectRootDir)Artifacts\</OutputBaseDir>
     <OutputPublicDir>$(OutputBaseDir)bin\public\</OutputPublicDir>
     <OutputInternalDir>$(OutputBaseDir)bin\internal\</OutputInternalDir>
+    <OutputExternalDir>$(OutputBaseDir)bin\external\</OutputExternalDir>
     <OutputDummyDir>$(OutputBaseDir)bin\dummy\</OutputDummyDir>
 
   </PropertyGroup>

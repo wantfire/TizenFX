@@ -33,11 +33,11 @@ internal static partial class Interop
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate bool IPv6AddressCallback(IntPtr ipv6, IntPtr userData);
 
-        [DllImport(Libraries.Connection, EntryPoint = "connection_create")]
-        public static extern int Create(out IntPtr handle);
+        [DllImport(Libraries.Connection, EntryPoint = "connection_create_cs")]
+        public static extern int Create(int tid, out IntPtr handle);
 
-        [DllImport(Libraries.Connection, EntryPoint = "connection_destroy")]
-        public static extern int Destroy(IntPtr handle);
+        [DllImport(Libraries.Connection, EntryPoint = "connection_destroy_cs")]
+        public static extern int Destroy(int tid, IntPtr handle);
 
         [DllImport(Libraries.Connection, EntryPoint = "connection_get_type")]
         public static extern int GetType(IntPtr handle, out int type);
@@ -87,7 +87,7 @@ internal static partial class Interop
         [DllImport(Libraries.Connection, EntryPoint = "connection_set_ip_address_changed_cb")]
         public static extern int SetIPAddressChangedCallback(IntPtr handle, ConnectionAddressChangedCallback callback, IntPtr userData);
 
-        [DllImport(Libraries.Connection, EntryPoint = "connection_set_ethernet_cable_state_chaged_cb")]
+        [DllImport(Libraries.Connection, EntryPoint = "connection_set_ethernet_cable_state_changed_cb")]
         public static extern int SetEthernetCableStateChagedCallback(IntPtr handle, EthernetCableStateChangedCallback callback, IntPtr userData);
 
         [DllImport(Libraries.Connection, EntryPoint = "connection_set_proxy_address_changed_cb")]
@@ -99,7 +99,7 @@ internal static partial class Interop
         [DllImport(Libraries.Connection, EntryPoint = "connection_unset_ip_address_changed_cb")]
         public static extern int UnsetIPAddressChangedCallback(IntPtr handle);
 
-        [DllImport(Libraries.Connection, EntryPoint = "connection_unset_ethernet_cable_state_chaged_cb")]
+        [DllImport(Libraries.Connection, EntryPoint = "connection_unset_ethernet_cable_state_changed_cb")]
         public static extern int UnsetEthernetCableStateChagedCallback(IntPtr handle);
 
         [DllImport(Libraries.Connection, EntryPoint = "connection_unset_proxy_address_changed_cb")]
@@ -206,6 +206,9 @@ internal static partial class Interop
 
         [DllImport(Libraries.Connection, EntryPoint = "connection_profile_get_dhcp_server_address")]
         public static extern int GetDhcpServerAddress(IntPtr profileHandle, AddressFamily family, out string dhcpServerAddress);
+
+        [DllImport(Libraries.Connection, EntryPoint = "connection_profile_get_dhcp_lease_duration")]
+        public static extern int GetDhcpLeaseDuration(IntPtr profileHandle, AddressFamily family, out int dhcpLeaseDuration);
 
         [DllImport(Libraries.Connection, EntryPoint = "connection_profile_refresh")]
         public static extern int Refresh(IntPtr profileHandle);

@@ -6,7 +6,6 @@
     <GenerateDependencyFile>False</GenerateDependencyFile>
     <Deterministic>True</Deterministic>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <NoWarn>$(NoWarn)</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -16,5 +15,7 @@
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)version.props" />
+
+  <Import Project="$(MSBuildThisFileDirectory)analyzers.props" Condition="'$(BuildWithAnalyzer)' == 'True' Or '$(BuildingInsideVisualStudio)' == 'True'" />
 
 </Project>
